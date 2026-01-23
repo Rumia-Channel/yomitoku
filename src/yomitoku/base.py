@@ -108,6 +108,9 @@ class BaseModule:
         if "cuda" in device:
             if torch.cuda.is_available():
                 self._device = torch.device(device)
+            elif hasattr(torch, "xpu") and torch.xpu.is_available():
+                self._device = torch.device("xpu")
+                logger.warning("CUDA is not available. Use XPU instead.")
             else:
                 self._device = torch.device("cpu")
                 logger.warning("CUDA is not available. Use CPU instead.")
@@ -117,6 +120,12 @@ class BaseModule:
             else:
                 self._device = torch.device("cpu")
                 logger.warning("MPS is not available. Use CPU instead.")
+        elif "xpu" in device:
+            if hasattr(torch, "xpu") and torch.xpu.is_available():
+                self._device = torch.device(device)
+            else:
+                self._device = torch.device("cpu")
+                logger.warning("XPU is not available. Use CPU instead.")
         else:
             self._device = torch.device("cpu")
 

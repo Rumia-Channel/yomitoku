@@ -466,7 +466,11 @@ def main():
     if args.lite:
         configs["ocr"]["text_recognizer"]["model_name"] = "parseq-tiny"
 
-        if args.device == "cpu" or not torch.cuda.is_available():
+        if args.device == "cpu" or (
+            args.device == "cuda"
+            and not torch.cuda.is_available()
+            and not (hasattr(torch, "xpu") and torch.xpu.is_available())
+        ):
             configs["ocr"]["text_detector"]["infer_onnx"] = True
 
         # Note: Text Detector以外はONNX推論よりもPyTorch推論の方が速いため、ONNX推論は行わない
